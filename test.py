@@ -4,7 +4,7 @@ import numpy as np
  
 # Load image
 
-image = cv2.imread('1.png')
+image = cv2.imread('2.png')
 
 grey = cv2.cvtColor(image, cv2.COLOR_BGRA2GRAY)
 
@@ -27,9 +27,10 @@ params = cv2.SimpleBlobDetector_Params()
  
 # Set Area filtering parameters
 
-params.filterByArea = False
+params.filterByArea = True
 
-params.minArea = 2000
+params.minArea = 30000
+params.maxArea = 50000
  
 # Set Circularity filtering parameters
 
@@ -57,6 +58,8 @@ detector = cv2.SimpleBlobDetector_create(params)
 # Detect blobs
 
 keypoints = detector.detect(canny)
+
+print(keypoints[0].pt, keypoints[0].size, keypoints[0].angle, keypoints[0].response)
  
 # Draw blobs on our image as red circles
 
@@ -65,6 +68,8 @@ blank = np.zeros((1, 1))
 blobs = cv2.drawKeypoints(canny, keypoints, blank, (0, 0, 255),
 
                           cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
+
+print(blobs)
  
 
 number_of_blobs = len(keypoints)
