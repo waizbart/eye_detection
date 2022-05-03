@@ -4,10 +4,19 @@ import numpy as np
 
 # Load image
 
-images = [cv2.imread('1.png'), cv2.imread('2.png'), cv2.imread('3.png'), cv2.imread('4.png')]
+olhar1 = [cv2.imread('1.png'), cv2.imread('2.png')]
+olhar2 = [cv2.imread('3.png'), cv2.imread('4.png')]
 
-for image in images:
+i = 0
 
+for image in olhar2:
+    if (i == 0):
+        print("Olho 1:\n")
+    else:
+        print("Olho 2:\n")
+    
+    
+    # Convert to grayscale
     grey = cv2.cvtColor(image, cv2.COLOR_BGRA2GRAY)
 
     kernel = np.ones((5, 5), np.uint8)
@@ -86,7 +95,8 @@ for image in images:
             break
 
     media = (circularity + convexity + inertia) / 3
-    print("Média", media)
+    print("Média:", media, "\n")
+    i=i+1
     # blank = np.zeros((1, 1))
 
     # blobs = cv2.drawKeypoints(grey, keypoints, blank, (255, 0, 0),
