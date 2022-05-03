@@ -1,10 +1,10 @@
 import cv2
 import matplotlib.pyplot as plt
 import numpy as np
- 
+
 # Load image
 
-image = cv2.imread('2.png')
+image = cv2.imread('1.png')
 
 grey = cv2.cvtColor(image, cv2.COLOR_BGRA2GRAY)
 
@@ -19,58 +19,76 @@ grey = cv2.threshold(grey, 140, 255, cv2.THRESH_BINARY)[1]
 grey = cv2.morphologyEx(grey, cv2.MORPH_CLOSE, kernel)
 
 canny = cv2.Canny(grey, 100, 200)
- 
+
 # Set our filtering parameters
 # Initialize parameter setting using cv2.SimpleBlobDetector
 
 params = cv2.SimpleBlobDetector_Params()
- 
+
 # Set Area filtering parameters
 
 params.filterByArea = True
 
 params.minArea = 30000
 params.maxArea = 50000
- 
-# Set Circularity filtering parameters
 
+# descobre qual a circularidade
 params.filterByCircularity = True
 
-params.minCircularity = 0.6
- 
-# Set Convexity filtering parameters
+circularity = 0
 
+for circularity in np.arange(1, 0, -0.01):
+    params.minCircularity = circularity
+
+    detector = cv2.SimpleBlobDetector_create(params)
+
+    keypoints = detector.detect(canny)
+
+    if (len(keypoints) > 0):
+        print("Circularity: ", circularity)
+        params.filterByCircularity = False
+        break
+
+#descoble a convexidade
 params.filterByConvexity = True
 
-params.minConvexity = 0.1
+convexity = 0
 
-     
-# Set inertia filtering parameters
+for convexity in np.arange(1, 0, -0.01):
+    params.minConvexity = convexity
 
+    detector = cv2.SimpleBlobDetector_create(params)
+
+    keypoints = detector.detect(canny)
+
+    if (len(keypoints) > 0):
+        print("Convexity: ", convexity)
+        params.filterByConvexity = False
+        break
+
+#descoble a inercia
 params.filterByInertia = True
 
-params.minInertiaRatio = 0.01
- 
-# Create a detector with the parameters
+inertia = 0
 
-detector = cv2.SimpleBlobDetector_create(params)
+for inertia in np.arange(1, 0, -0.01):
+    params.minInertiaRatio = inertia
 
-# Detect blobs
+    detector = cv2.SimpleBlobDetector_create(params)
 
-keypoints = detector.detect(canny)
+    keypoints = detector.detect(canny)
 
-print(keypoints[0].pt, keypoints[0].size, keypoints[0].angle, keypoints[0].response)
- 
-# Draw blobs on our image as red circles
+    if (len(keypoints) > 0):
+        print("inertia: ", inertia)
+        params.filterByInertia = False
+        break
 
-blank = np.zeros((1, 1)) 
 
-blobs = cv2.drawKeypoints(canny, keypoints, blank, (0, 0, 255),
+blank = np.zeros((1, 1))
+
+blobs = cv2.drawKeypoints(canny, keypoints, blank, (255, 0, 0),
 
                           cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
-
-print(blobs)
- 
 
 number_of_blobs = len(keypoints)
 
@@ -79,7 +97,7 @@ text = "Number of Circular Blobs: " + str(len(keypoints))
 cv2.putText(blobs, text, (20, 550),
 
             cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 100, 255), 2)
- 
+
 # Show blobs
 
 plt.imshow(blobs)
