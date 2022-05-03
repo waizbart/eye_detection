@@ -4,101 +4,104 @@ import numpy as np
 
 # Load image
 
-image = cv2.imread('3.png')
+images = [cv2.imread('1.png'), cv2.imread('2.png'), cv2.imread('3.png'), cv2.imread('4.png')]
 
-grey = cv2.cvtColor(image, cv2.COLOR_BGRA2GRAY)
+for image in images:
 
-kernel = np.ones((5, 5), np.uint8)
-# Blurring and erasing little details
-grey = cv2.GaussianBlur(grey, (9, 9), 0)
-grey = cv2.morphologyEx(grey, cv2.MORPH_OPEN, kernel)
-grey = cv2.morphologyEx(grey, cv2.MORPH_CLOSE, kernel)
+    grey = cv2.cvtColor(image, cv2.COLOR_BGRA2GRAY)
 
-# Thresholding to highlight the more dark areas
-#grey = cv2.threshold(grey, 150, 255, cv2.THRESH_BINARY)[1]
-grey = cv2.morphologyEx(grey, cv2.MORPH_CLOSE, kernel)
+    kernel = np.ones((5, 5), np.uint8)
+    # Blurring and erasing little details
+    grey = cv2.GaussianBlur(grey, (9, 9), 0)
+    grey = cv2.morphologyEx(grey, cv2.MORPH_OPEN, kernel)
+    grey = cv2.morphologyEx(grey, cv2.MORPH_CLOSE, kernel)
 
-#canny = cv2.Canny(grey, 100, 200)
+    # Thresholding to highlight the more dark areas
+    #grey = cv2.threshold(grey, 150, 255, cv2.THRESH_BINARY)[1]
+    grey = cv2.morphologyEx(grey, cv2.MORPH_CLOSE, kernel)
 
-# Set our filtering parameters
-# Initialize parameter setting using cv2.SimpleBlobDetector
+    #canny = cv2.Canny(grey, 100, 200)
 
-params = cv2.SimpleBlobDetector_Params()
+    # Set our filtering parameters
+    # Initialize parameter setting using cv2.SimpleBlobDetector
 
-# Set Area filtering parameters
+    params = cv2.SimpleBlobDetector_Params()
 
-params.filterByArea = True
+    # Set Area filtering parameters
 
-params.minArea = 10000
-params.maxArea = 100000
+    params.filterByArea = True
 
-# descobre qual a circularidade
-params.filterByCircularity = True
+    params.minArea = 10000
+    params.maxArea = 100000
 
-circularity = 0
+    # descobre qual a circularidade
+    params.filterByCircularity = True
 
-for circularity in np.arange(1, 0, -0.01):
-    params.minCircularity = circularity
+    circularity = 0
 
-    detector = cv2.SimpleBlobDetector_create(params)
+    for circularity in np.arange(1, 0, -0.01):
+        params.minCircularity = circularity
 
-    keypoints = detector.detect(grey)
+        detector = cv2.SimpleBlobDetector_create(params)
 
-    if (len(keypoints) > 0):
-        print("Circularity: ", circularity)
-        params.filterByCircularity = False
-        break
+        keypoints = detector.detect(grey)
 
-#descoble a convexidade
-params.filterByConvexity = True
+        if (len(keypoints) > 0):
+            print("Circularity: ", circularity)
+            params.filterByCircularity = False
+            break
 
-convexity = 0
+    #descoble a convexidade
+    params.filterByConvexity = True
 
-for convexity in np.arange(1, 0, -0.01):
-    params.minConvexity = convexity
+    convexity = 0
 
-    detector = cv2.SimpleBlobDetector_create(params)
+    for convexity in np.arange(1, 0, -0.01):
+        params.minConvexity = convexity
 
-    keypoints = detector.detect(grey)
+        detector = cv2.SimpleBlobDetector_create(params)
 
-    if (len(keypoints) > 0):
-        print("Convexity: ", convexity)
-        params.filterByConvexity = False
-        break
+        keypoints = detector.detect(grey)
 
-#descoble a inercia
-params.filterByInertia = True
+        if (len(keypoints) > 0):
+            print("Convexity: ", convexity)
+            params.filterByConvexity = False
+            break
 
-inertia = 0
+    #descoble a inercia
+    params.filterByInertia = True
 
-for inertia in np.arange(1, 0, -0.01):
-    params.minInertiaRatio = inertia
+    inertia = 0
 
-    detector = cv2.SimpleBlobDetector_create(params)
+    for inertia in np.arange(1, 0, -0.01):
+        params.minInertiaRatio = inertia
 
-    keypoints = detector.detect(grey)
+        detector = cv2.SimpleBlobDetector_create(params)
 
-    if (len(keypoints) > 0):
-        print("inertia: ", inertia)
-        params.filterByInertia = False
-        break
+        keypoints = detector.detect(grey)
 
+        if (len(keypoints) > 0):
+            print("inertia: ", inertia)
+            params.filterByInertia = False
+            break
 
-blank = np.zeros((1, 1))
+    media = (circularity + convexity + inertia) / 3
+    print("Média", media)
+    # blank = np.zeros((1, 1))
 
-blobs = cv2.drawKeypoints(grey, keypoints, blank, (255, 0, 0),
+    # blobs = cv2.drawKeypoints(grey, keypoints, blank, (255, 0, 0),
 
-                          cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
+    #                         cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
 
-number_of_blobs = len(keypoints)
+    # number_of_blobs = len(keypoints)
 
-text = "Number of Circular Blobs: " + str(len(keypoints))
+    # text = "Number of Circular Blobs: " + str(len(keypoints))
 
-cv2.putText(blobs, text, (20, 550),
+    # cv2.putText(blobs, text, (20, 550),
 
-            cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 100, 255), 2)
+    #             cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 100, 255), 2)
 
-# Show blobs
+    # # Show blobs
 
-plt.imshow(blobs)
-plt.show()
+    # plt.imshow(blobs)
+    # plt.show()
