@@ -1,30 +1,27 @@
 import cv2 as cv
 import numpy as np
 import matplotlib.pyplot as plt
+import mahotas
 
 eyes = [cv.imread(str(i) + '.png') for i in range(1, 14)]
 
 for image in eyes:
     grey = cv.cvtColor(image, cv.COLOR_BGRA2GRAY)
+    grey = cv.equalizeHist(grey)
+    kernel = cv.getStructuringElement(cv.MORPH_ELLIPSE,(30,30))
+    kernel2 = cv.getStructuringElement(cv.MORPH_ELLIPSE,(3,3))
 
-    kernel = np.ones((5, 5), np.uint8)
-    # Blurring and erasing little details
-    grey = cv.GaussianBlur(grey, (9, 9), 0)
-    grey = cv.morphologyEx(grey, cv.MORPH_OPEN, kernel)
+    grey = cv.medianBlur(grey, 15)
+    grey = cv.GaussianBlur(grey, (15, 15), 0)
+
+    grey = cv.threshold(grey, 140, 255, cv.THRESH_TOZERO)[1]
+
     grey = cv.morphologyEx(grey, cv.MORPH_CLOSE, kernel)
-
-    # Thresholding to highlight the more dark areas
-    grey = cv.threshold(grey, 150, 255, cv.THRESH_BINARY)[1]
-    grey = cv.morphologyEx(grey, cv.MORPH_CLOSE, kernel)
-
-    #canny = cv.Canny(grey, 100, 200)
-
-    # Set our filtering parameters
-    # Initialize parameter setting using cv.SimpleBlobDetector
-
+    
+    grey = cv.dilate(grey , kernel2 ,iterations = 20)
+    grey = cv.erode(grey , kernel2,iterations = 21)
+ 
     params = cv.SimpleBlobDetector_Params()
-
-    # Set Area filtering parameters
 
     params.filterByArea = True
 
@@ -92,15 +89,19 @@ for image in eyes:
 
     number_of_blobs = len(keypoints)
 
-    text = "Number of Circular Blobs: " + str(len(keypoints))
+    text = "Circularidade: " + str(round(media, 4))
 
-    cv.putText(blobs, text, (20, 550),
+    #blobs image size
+    height, width = blobs.shape[:2]
 
-                cv.FONT_HERSHEY_SIMPLEX, 1, (0, 100, 255), 2)
+    textX = int(width/10)
+    textY = int(height/10)
+    
+    cv.putText(blobs, text, (textX, textY),
+                cv.FONT_HERSHEY_TRIPLEX, 3, (255, 0, 0), 2)
 
     # Show blobs
 
     plt.imshow(blobs)
-    plt.pause(3)
-    
-plt.show()
+    plt.show()
+
