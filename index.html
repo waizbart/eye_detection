@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+    <script src="libs/opencv340.js"></script>
+    <script src="libs/utils.js"></script>
+
+    <style>
+        body {
+            display: flex;
+            align-items: center;
+            flex-direction: column;
+            justify-content: center;
+            margin: 0;
+            padding: 0;
+            background-color: #000;
+            color: white;
+        }
+
+        h1 {
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+
+        div {
+            margin-left: 50px;
+        }
+
+        #imageSrc,
+        #canvasOutput {
+            border-radius: 50px;
+        }
+        
+    </style>
+</head>
+
+<body>
+    <h1>Selecionar imagem a ser processada:</h1>
+    <input type="file" id="fileInput" name="file" style="font-size: 20pt;"/>
+    <h1>Imagem selecionada: </h1>
+    <img width="20%" id="imageSrc"/>
+    <h1>Imagem processada: </h1>
+    <canvas width="20%" id="canvasOutput"></canvas>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
